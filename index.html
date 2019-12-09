@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./hal.js"></script>
+</head>
+<body>
+    <div style="text-align: center;" id='app'>
+        <h1 >Hal.js v${version}</h1>
+        <ol style="background-color:rgba(${factor * 10 % 255},${factor * 20 % 255},${factor * 30 % 255},1);">
+            ${StudentList(list)}
+        </ol>
+        <center>
+            ${time}
+        </center>
+
+        <deneme></deneme>
+
+    </div>
+</body>
+<script>
+    class Student{
+        constructor({name}){
+            this.name  = name;
+        }
+    }
+
+    function StudentList(list){
+        return list.map( student  => `<ul>${student.name}</ul>`).join("");
+    }
+
+    let hal = new Hal({elem:app});
+    
+    hal.component('deneme',{
+        template: "<h2>${version><h2>"
+    });
+
+    hal.initState({
+        num1: 5,
+        num2: 6,
+        list: [],
+        time: new Date(),
+        color: "black",
+        factor: 10,
+        version: 0.1
+    });
+
+    hal.state.num1 = 5;
+    hal.state.num2 = 6;
+    hal.state.list = [
+        new Student({name:'ali'}),
+        new Student({name:'kemal'}),
+        new Student({name:'ahmet'}),
+        new Student({name:'burhan'}),
+        new Student({name:'kadir'}),
+        new Student({name:'samet'}),
+    ]
+
+    // setInterval(()=>{ 
+    //     hal.state.time = new Date();
+    //     hal.state.factor = time.getTime() / 20;
+    // },250);
+</script>
+</html>
