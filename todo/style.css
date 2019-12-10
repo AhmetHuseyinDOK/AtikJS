@@ -45,6 +45,14 @@ input{
     background: white;
 }
 
+.centerText{
+    text-align: center;
+}
+
+.checkbox:hover{
+    background: chocolate;
+}
+
 .checkbox span{
     font-weight: 800;
     color: black;

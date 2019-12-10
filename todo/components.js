@@ -49,6 +49,11 @@ function checkbox(attributes){
 
 function todoList(attributes){
     const {list} = attributes;
+    
+    if(list.length == 0){
+        return Atik.createElement('div',{className:"centerText"},'list is empty')
+    }
+
     return Atik.createElement(
         'ul',
         null,
