@@ -1,0 +1,51 @@
+.main {
+    width: 100%; 
+    color: white; 
+    font-size: large; 
+}
+
+h1,h2,h3,h4,h5,h6{
+    text-align: center;
+}
+
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li{
+    display: flex;
+    padding: 5px;
+}
+
+li div{
+    flex:1;
+    text-align:center;
+}
+
+body{
+    background: darkslateblue;
+    padding: 10px;
+}
+
+input{
+    font-size: large;
+    padding: 25px;
+    width: 90%;
+}
+
+.checkbox{
+    
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+}
+
+.checkbox span{
+    font-weight: 800;
+    color: black;
+}

@@ -1,61 +1,124 @@
+class Atik{
+    static createElement(tag, attributes,...children){
+        return new RenderNode(new Element(tag,attributes,children));    
+    }
+
+    static render(renderNode , elem){
+        elem.innerHTML = ""
+        elem.appendChild(renderNode.render());
+    }
+
+}
+
+
+
+class Element{
+    constructor(tag , attributes,children){
+        this.tag =  tag;
+        this.attributes = attributes;
+        this.children =  children;
+    }
+}
+
+class RenderNode{
+
+    constructor(elem){
+        this.elem = elem;
+        this.htmlNode; 
+    }   
+
+    appendChild(child){
+        this.children.push(child);
+    }
+    
+    //refactor it or die!!!
+    render(attributes = this.elem.attributes, children = this.elem.children){
+        
+        if(this.elem.attributes == attributes && this.elem.children == children  && this.htmlNode != null){
+            return this.htmlNode;
+        }
+
+        this.elem.attributes =  attributes;
+        this.elem.children = children;
+        
+        //just in first render
+        if(!this.htmlNode){
+            if(typeof this.elem.tag == "function"){
+                let res = this.elem.tag(this.elem.attributes);
+                this.htmlNode = res.render(); 
+                this.renderFunction = this.elem.tag;
+                return this.htmlNode;
+            }else{
+                this.htmlNode = document.createElement(this.elem.tag,this.elem.attributes);
+            }  
+        }
+
+        //check if a Atik Component
+        if(this.renderFunction){
+            this.htmlNode.innerHTML = "";
+            this.htmlNode.appendChild(this.renderFunction(this.elem.attributes).render());
+            return this.htmlNode;
+        }
+
+        //assign attributes
+        if(this.elem.attributes){
+            
+            Object.assign(this.htmlNode,this.elem.attributes)  
+        }
+
+        //clear child
+        this.htmlNode.innerHTML = "";
+        
+        for (const child of this.elem.children) {
+            //checks if a render object or just a string
+            if(typeof child == "string"){
+                this.htmlNode.appendChild(document.createTextNode(child));    
+            }else{
+                this.htmlNode.appendChild(child.render());
+            }
+        }
+            
+        return this.htmlNode;
+
+    }
+
+    
+
+}
+
 class Hal{
 
-    constructor({elem}){
-        this.root = elem;
-        this.$_html = this.root.innerHTML;
-        this.$_state = {};
-        this.components = new Map();
-        this.state = new Proxy(this.$_state,this.$_stateHandler());
-    }
-
-    component(name,{template}){
-        this.components.set(name,{template});
-    }
-
-    initState(obj){
-        for(let key in obj){
-            window[key] = obj[key];
-        }
-        this.$_renderHTML(this.$_html);
-    }
-
-    $_stateHandler(){
-        let that = this;
-        return {
-            set: function(obj, prop, value) {
-                window[prop] = value;
-                obj[prop] = value;
-                that.$_renderHTML(that.$_html);
-            }
+    constructor(state = {}){
+        this.state = state
+        this.bindings = {}
+        for(const key of Object.keys(state)){
+            this.bindings[key] = [];
         }
     }
 
-    $_renderHTML(html){
-        let componentReg = /<[^\/]*\>.*<\/[^\>]*>/g;
-
-        let propReg =  / [^=]*="[^"]*"/g;
-        
-        let componentCompiled  = html.replace(componentReg, (match) => {
-            console.log(match);
-            let [componentKey ,...props] = match.slice(1,-2);
-            console.log(componentKey);
-            let component = this.components.get(componentKey);
-            if(component){
-                return component.template;
-            }
-            return match;
-        });
-
-
-        let reg = /\${[^}]*}/g;
-        
-        let res = componentCompiled.replace(reg,(match) => {
-            let val = match.slice(2,-1);
-            let compiled;
-            compiled = eval(val);
-            return compiled;
-        });
-        
-        this.root.innerHTML = res;
+    setState(state){
+        this.state = {...this.state , ...state};
+        this.notify(Object.keys(state),this.state);
     }
+
+    bind(keys, func){
+        for (const key of keys) {
+            this.bindings[key].push(func);    
+        }
+    }
+
+    notify(keys,state){
+        let funcs = new Set();
+        
+        for (const key of keys) {
+            for (const func of this.bindings[key]) {
+                funcs.add(func);   
+            }
+        }
+
+        for (const func of funcs) {
+            func(state);
+        }
+    }
+
 }

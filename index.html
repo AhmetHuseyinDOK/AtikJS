@@ -9,59 +9,76 @@
 </head>
 <body>
     <div style="text-align: center;" id='app'>
-        <h1 >Hal.js v${version}</h1>
-        <ol style="background-color:rgba(${factor * 10 % 255},${factor * 20 % 255},${factor * 30 % 255},1);">
-            ${StudentList(list)}
-        </ol>
-        <center>
-            ${time}
-        </center>
-
-        <deneme></deneme>
-
     </div>
 </body>
 <script>
-    class Student{
-        constructor({name}){
-            this.name  = name;
+
+        function studentList(attributes){
+            return Atik.createElement(
+                'ul',
+                null,
+                ...attributes.list.map( s => student({name:s.name,id:s.id}))
+            )
         }
-    }
 
-    function StudentList(list){
-        return list.map( student  => `<ul>${student.name}</ul>`).join("");
-    }
+        function student(attributes){
+            return Atik.createElement(
+                'li',
+                null,
+                attributes.id+" "+attributes.name
+            )
+        }
 
-    let hal = new Hal({elem:app});
-    
-    hal.component('deneme',{
-        template: "<h2>${version><h2>"
-    });
-
-    hal.initState({
-        num1: 5,
-        num2: 6,
-        list: [],
-        time: new Date(),
-        color: "black",
-        factor: 10,
-        version: 0.1
-    });
-
-    hal.state.num1 = 5;
-    hal.state.num2 = 6;
-    hal.state.list = [
-        new Student({name:'ali'}),
-        new Student({name:'kemal'}),
-        new Student({name:'ahmet'}),
-        new Student({name:'burhan'}),
-        new Student({name:'kadir'}),
-        new Student({name:'samet'}),
+    let list = [
+        {
+            name: "ahmet dok",
+            id: 112
+        },
+        {
+            name: "kemal ak",
+            id: 113
+        },
+        {
+            name: "ahmet beyaz",
+            id: 114
+        },
     ]
+    let nameEl = Atik.createElement('h6',null,"Ahmet Dok");
+    let timeEl = Atik.createElement('h1',null,"Deneme");
+    let studentEl = Atik.createElement(student,{name:"ahmet",id:"213"})
+    let studentListName = Atik.createElement(studentList,{list});
 
-    // setInterval(()=>{ 
-    //     hal.state.time = new Date();
-    //     hal.state.factor = time.getTime() / 20;
-    // },250);
+    let elem = Atik.createElement(
+        "div",
+        null,
+        timeEl,
+        nameEl,
+        studentListName
+    );
+    let asd = Atik.createElement(
+        "div",
+        {
+            style:"background:blue"
+        },
+        elem
+    )
+    Atik.render(elem,app);
+    Atik.render(asd,app);
+
+    const hal = new Hal({
+        name: "ali",
+        deneme: "iki",
+        surname: "asdsa",
+        time: new Date()
+    });
+
+    hal.bind(["name","deneme"],({name,deneme}) => console.log(name + " " + deneme));
+    hal.bind(["name"],({name}) => nameEl.render(null,name));
+    hal.bind(["time"],({time}) => timeEl.render(null,time.toString()))
+
+    setInterval(()=>{hal.setState({time: new Date()})},500)
+
+    hal.setState({name:"name"})
+
 </script>
 </html>
