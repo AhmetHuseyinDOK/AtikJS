@@ -1,7 +1,7 @@
-.main {
-    width: 100%; 
+.main { 
     color: white; 
     font-size: large; 
+    margin: 50px;
 }
 
 h1,h2,h3,h4,h5,h6{
@@ -26,13 +26,12 @@ li div{
 
 body{
     background: darkslateblue;
-    padding: 10px;
 }
 
 input{
     font-size: large;
     padding: 25px;
-    width: 90%;
+    width: calc(100% - 50px);
 }
 
 .checkbox{
