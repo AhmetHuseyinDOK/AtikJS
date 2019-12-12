@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../hal.js"></script>
+</head>
+<style>
+    table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+<body>
+    <div id='app'>
+    </div>
+</body>
+<script>
+
+    
+
+    function student(props){
+        return Atik.createElementFromTemplate(`
+            <mark>{{props.name}}</mark>
+        `,props);
+    }
+
+    
+    function table(props){
+        return Atik.createElementFromTemplate( `
+            <table>
+                <tr>
+                    <th a-list="name in props.headers">{{props.name}}</th>
+                </tr>
+                <tr a-list="values in props.list">
+                    <th a-list="value in props.values">{{props.value}}</th>
+                </tr>
+            </table>   
+        `,props);
+    }
+    
+    let headers = ["id","name"];
+
+    let list = 
+    [
+        ["23423423","ahmet ak"],
+        [23423123,"kemal deveci"],
+        [23443423,"yusuf akan"],
+        [67423423,"ramiz dok"],
+        [21233423,"erdem akkaya"]
+    ]
+
+    Atik.render(table({headers,list}),app);
+
+
+</script>
+</html>
