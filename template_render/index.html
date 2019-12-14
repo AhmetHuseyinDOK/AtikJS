@@ -46,7 +46,7 @@ tr:nth-child(even) {
                     <th a-list="name in props.headers">{{props.name}}</th>
                 </tr>
                 <tr a-list="values in props.list">
-                    <th a-list="value in props.values">{{props.value}}</th>
+                    <th a-list="value in props.values"><a-student name={{props.value}}></a-student></th>
                 </tr>
             </table>   
         `,props);

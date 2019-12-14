@@ -113,7 +113,7 @@ function nodeToAtikElement(node,props){
     let tag = nodeName.startsWith('a-') ? eval(nodeName.slice(2)) : nodeName ;
     
     let children = [];
-
+    
     let aProps = [];
 
     for (const {name,value} of node.attributes) {
