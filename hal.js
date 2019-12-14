@@ -1,20 +1,92 @@
 class Atik{
+
+
+    /**
+     * 
+     * @param {*} name 
+     * @param {object} parameters 
+     */
+    static component(name,{template}){
+        window[name] = (props) => {
+            return Atik.createElementFromTemplate(template,props);
+        }
+    }
+
+    /**
+     * 
+     * @param {*} tag 
+     * @param {*} attributes 
+     * @param  {...any} children 
+     * @returns {RenderNode} renderNode
+     */
     static createElement(tag, attributes,...children){
         return new RenderNode(new Element(tag,attributes,children));    
     }
+
+    /**
+     * 
+     * @param {*} temp 
+     * @param {*} props
+     * @returns {RenderNode} renderNode
+     */
 
     static createElementFromTemplate(temp ,props){
         return createElementFromTemplate(temp,props);
     }
 
-    static render(renderNode , elem){
-        elem.innerHTML = ""
+    /**
+     * 
+     * @param {Function} component 
+     * @param {HTMLElement} elem 
+     * @param {props } object 
+     */
+    constructor(component , elem , {props}){
+
+        this.hal = new Hal();
+
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+        }
+        let renderNode  = Atik.createElement(component , props );
         elem.appendChild(renderNode.render());
+        
     }
 
 }
 
 
+
+class Memoize{
+
+    static init(){
+        Memoize.map = new Map();
+    }
+
+    static remember(argObj){
+        argObj = JSON.stringify(argObj);
+        let res = Memoize.map.get(argObj);
+        return res;
+    }
+
+    static memoize(argumentObj , result){
+
+        argumentObj =  JSON.stringify(argumentObj);
+        
+        let args = Memoize.map.get(argumentObj);
+        
+        if(!args){
+            Memoize.map.set(argumentObj , result);
+        }
+        
+        return result;
+    
+    }
+
+
+
+}
+
+Memoize.init();
 
 class Element{
     constructor(tag , attributes,children){
@@ -24,8 +96,13 @@ class Element{
     }
 }
 
+
 class RenderNode{
 
+    /**
+     * 
+     * @param {Element} elem 
+     */
     constructor(elem){
         this.elem = elem;
         this.htmlNode; 
@@ -36,32 +113,43 @@ class RenderNode{
     }
     
     //refactor it or die!!!
-    render(attributes = this.elem.attributes, children = this.elem.children){
-        
-        if(this.elem.attributes == attributes && this.elem.children == children  && this.htmlNode != null){
-            return this.htmlNode;
-        }
+    render(attributes = this.elem.attributes, children = this.elem.children ){
+
+
+        // if(this.elem.attributes == attributes && this.elem.children == children  && this.htmlNode != null){
+        //     return this.htmlNode;
+        // }
 
         this.elem.attributes =  attributes;
         this.elem.children = children;
         
+        if(arguments.length != 0){
+            let memory = Memoize.remember(arguments);
+            if(memory != undefined){
+                return memory;
+            }
+        }
+
         //just in first render
         if(!this.htmlNode){
             if(typeof this.elem.tag == "function"){
                 let res = this.elem.tag(this.elem.attributes);
                 this.htmlNode = res.render(); 
                 this.renderFunction = this.elem.tag;
-                return this.htmlNode;
+                return Memoize.memoize(arguments , this.htmlNode);
             }else{
                 this.htmlNode = document.createElement(this.elem.tag,this.elem.attributes);
             }  
         }
 
+
+        
+
         //check if a Atik Component
         if(this.renderFunction){
             this.htmlNode.innerHTML = "";
             this.htmlNode.appendChild(this.renderFunction(this.elem.attributes).render());
-            return this.htmlNode;
+            return Memoize.memoize(arguments , this.htmlNode);
         }
 
         //assign attributes
@@ -74,15 +162,16 @@ class RenderNode{
         this.htmlNode.innerHTML = "";
         for (const child of this.elem.children) {
               
-            //checks if a render object or just a string
+            //checks if a render node or just a string
             if(typeof child == "string"){
                 this.htmlNode.appendChild(document.createTextNode(child));    
             }else{
                 this.htmlNode.appendChild(child.render());
             }
         }
-            
-        return this.htmlNode;
+        
+
+        return Memoize.memoize(arguments , this.htmlNode);
 
     }
 
@@ -98,6 +187,8 @@ function createElementFromTemplate(temp , props){
 
 function nodeToAtikElement(node,props){
     
+
+
     let nodeName = node.localName;
     
     let attrObj = {};
@@ -118,19 +209,31 @@ function nodeToAtikElement(node,props){
 
     for (const {name,value} of node.attributes) {
 
-        let res = value.replace(evalReg, (match) => {
-            let exp = match.slice(2,-2);
-            return eval(exp);
-        });
+        let res;
+
+        //dangerous
+        if(name.startsWith('on')){
+            res = eval(value);
+        }else{
+            res = value.replace(evalReg, (match) => {
+                let exp = match.slice(2,-2);
+                return eval(exp);
+            });
+        }
+        
+        
+        
 
         if(name.startsWith('a-')){
             aProps.push({name,value})
         }else{
+            
             attrObj[name] = res;    
         }
 
         
     } 
+
 
     for( const {name ,value} of aProps){
         
