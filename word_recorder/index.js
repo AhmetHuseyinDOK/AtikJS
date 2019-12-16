@@ -35,7 +35,7 @@ Atik.component('new_word_screen' ,{
 Atik.component('word_list_header',{
     template: `
         <div class="word_list_header">
-            {{ props.words.size }} <br>
+            {{ props.words.size }} </br>
             <span>word you have learnt</span>
         </div>
     `,

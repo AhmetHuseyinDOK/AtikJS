@@ -9,12 +9,12 @@ body{
     background-color: indigo;
     color: white;
     font-weight: bolder;
-    font-size: 20px;
+    font-size: 40px;
 }
 
 .word_list_header span{
     font-weight: lighter;
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .word_list_item{
