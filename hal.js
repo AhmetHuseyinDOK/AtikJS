@@ -95,7 +95,7 @@ class Atik{
         elem.appendChild(Atik.root);
         
         window.onhashchange = function(event) {
-            console.log(event);
+           
             Atik.render(elem);
         };
 
@@ -166,7 +166,6 @@ class RenderNode{
     //refactor it or die!!!
     render(elem ){
         
-        //console.log(elem);
 
         //if not mounted which means the first render
         if(!this.htmlNode){
@@ -243,11 +242,14 @@ function createElementFromTemplate(temp , props){
 
 function nodeToAtikElement(node,props){
     
-
-
     let nodeName = node.localName;
     
     let attrObj = {};
+
+    if(node.className){
+        attrObj.className =  node.className;
+    }
+
     const evalReg = /{{[^}]*}}/g;
     
     if(node.nodeName == "#text"){
@@ -349,7 +351,7 @@ function nodeToAtikElement(node,props){
     }
 
 
-    
+    console.log(attrObj)
     return Atik.createElement(tag,attrObj,...children);
 }
 
@@ -400,5 +402,5 @@ class Hal{
 }
 
 Atik.component('link',{
-    template: `<button onclick="{{() => window.location.hash =  props.to }}">{{props.name}}</button>`
+    template: `<a onclick="{{(e) => {e.preventDefault();  window.location.hash =  props.to } }}">{{props.name}}</a>`
 });

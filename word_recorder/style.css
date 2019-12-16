@@ -1,0 +1,92 @@
+body{
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.word_list_header{
+    padding: 40px;
+    text-align: center;
+    background-color: indigo;
+    color: white;
+    font-weight: bolder;
+    font-size: 20px;
+}
+
+.word_list_header span{
+    font-weight: lighter;
+    font-size: 10px;
+}
+
+.word_list_item{
+    margin-bottom: 10px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: -2px 4px 5px 1px rgba(0,0,0,0.16);
+    border: solid lavender 1px;
+    text-align: center;
+}
+
+.word_list{
+    padding: 20px;
+}
+
+.fab{
+    --size: 60px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: var(--size);
+    height: var(--size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: indigo;
+    color: white;
+    border-radius:  var(--size);
+}
+
+a.fab{
+    text-decoration: none;
+}
+
+.no_words{
+    text-align: center;
+    padding-top: 40vh;
+    padding-bottom: 40vh;
+}
+
+input{
+    padding: 10px;
+    height: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 10px;
+    display: block;
+    width: 80%;
+}
+
+.new_word_screen{
+    height: 100vh;
+
+}
+
+.new_word_screen .header{
+    color: white;
+    text-align: center;
+    padding: 25px;
+    background-color: indigo;
+}
+
+.new_word_screen .body{
+    padding-top: 100px;
+}
+
+.new_word_screen .save{
+    text-align: center;
+    color: white;
+    padding: 40px;
+    position: absolute;
+    width: calc( 100% - 80px);
+    bottom: 0;
+    background-color: indigo;
+}
