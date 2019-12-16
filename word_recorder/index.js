@@ -1,5 +1,7 @@
+
+
 Atik.init({
-    words: new Map()
+    words: new Map(JSON.parse(window.localStorage.getItem('words')))
 })
 
 Atik.component('word_list_item',{
@@ -94,3 +96,8 @@ function addWord({word , meaning,example,exampleMeaning}){
     let wordMap = new Map([...Atik.hal.state.words , [savedWord.id , savedWord]])
     Atik.hal.setState({words: wordMap})
 }
+
+Atik.hal.bind(["words"], ({words}) => {
+    let wordsJSON = JSON.stringify([...words]);
+    window.localStorage.setItem('words',wordsJSON)
+});
