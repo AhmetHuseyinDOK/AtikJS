@@ -15,7 +15,7 @@ body{
 .word_list_header span{
     font-weight: lighter;
     font-size: 14px;
-}
+}w
 
 .word_list_item{
     margin-bottom: 10px;
@@ -56,8 +56,8 @@ a.fab{
 }
 
 input{
-    padding: 10px;
-    height: 20px;
+    font-size: 20px;
+    padding: 30px;
     margin-right: auto;
     margin-left: auto;
     margin-top: 10px;
@@ -78,7 +78,7 @@ input{
 }
 
 .new_word_screen .body{
-    padding-top: 100px;
+    padding-top: 20px;
 }
 
 .new_word_screen .save{
