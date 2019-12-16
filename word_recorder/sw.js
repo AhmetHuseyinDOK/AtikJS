@@ -1,5 +1,6 @@
 const CACHE ='JS'
-const FILES = ['/AtikJS/word_recorder/']
+const fontURL = 'https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&display=swap';
+const FILES = ['/AtikJS/word_recorder/','/AtikJS/hal.js','/AtikJS/word_recorder/index.js','/AtikJS/word_recorder/style.css',fontURL]
 function installCB(e) {
   e.waitUntil(
     caches.open(CACHE)
