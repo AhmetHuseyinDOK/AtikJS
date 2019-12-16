@@ -62,6 +62,7 @@ input{
     margin-left: auto;
     margin-top: 10px;
     display: block;
+    border: none;
     width: 80%;
 }
 
