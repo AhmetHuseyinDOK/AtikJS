@@ -1,3 +1,4 @@
+let arr = [];
 class Atik{
 
 
@@ -6,10 +7,27 @@ class Atik{
      * @param {*} name 
      * @param {object} parameters 
      */
-    static component(name,{template}){
-        window[name] = (props) => {
-            return Atik.createElementFromTemplate(template,props);
+    static component(name,{template ,watch }){
+        let fun  = (props) => {
+            let elem =  Atik.createElementFromTemplate(template,props);
+            elem.watch = watch;
+            
+            return elem;
         }
+
+        window[name] = new Proxy(fun,{
+            apply: (target , thisArg , argArr) => {
+                
+                let res =  target(...argArr);
+                arr.push(res);
+                return res;
+            }
+        });
+        
+    }
+
+    static $_render(){
+        
     }
 
     /**
@@ -17,10 +35,10 @@ class Atik{
      * @param {*} tag 
      * @param {*} attributes 
      * @param  {...any} children 
-     * @returns {RenderNode} renderNode
+     * @returns {Element} renderNode
      */
     static createElement(tag, attributes,...children){
-        return new RenderNode(new Element(tag,attributes,children));    
+        return new Element(tag,attributes,children);    
     }
 
     /**
@@ -36,23 +54,32 @@ class Atik{
 
     /**
      * 
+     * @param {object} props 
+     */
+    static init(props){
+        Atik.hal = new Hal(props);
+    }
+
+    /**
+     * 
      * @param {Function} component 
      * @param {HTMLElement} elem 
      * @param {props } object 
      */
-    constructor(component , elem , {props}){
-
-        this.hal = new Hal();
+    static render(component , elem , {props}){
 
         while (elem.firstChild) {
             elem.removeChild(elem.firstChild);
         }
-        let renderNode  = Atik.createElement(component , props );
-        elem.appendChild(renderNode.render());
+
+        Atik.element  = Atik.createElement(component , props );
+        Atik.root = new RenderNode().render(Atik.element);
+        elem.appendChild(Atik.root);
         
     }
 
 }
+
 
 
 
@@ -96,82 +123,86 @@ class Element{
     }
 }
 
-
+let i = 0;
+let htmlNodes = [];
 class RenderNode{
 
     /**
      * 
      * @param {Element} elem 
      */
-    constructor(elem){
-        this.elem = elem;
-        this.htmlNode; 
+    constructor(){
+        this.$_htmlNode;
     }   
 
-    appendChild(child){
-        this.children.push(child);
-    }
+
     
+
     //refactor it or die!!!
-    render(attributes = this.elem.attributes, children = this.elem.children ){
-
-
-        // if(this.elem.attributes == attributes && this.elem.children == children  && this.htmlNode != null){
-        //     return this.htmlNode;
-        // }
-
-        this.elem.attributes =  attributes;
-        this.elem.children = children;
+    render(elem ){
         
-        if(arguments.length != 0){
-            let memory = Memoize.remember(arguments);
-            if(memory != undefined){
-                return memory;
-            }
-        }
+        //console.log(elem);
 
-        //just in first render
+        //if not mounted which means the first render
         if(!this.htmlNode){
-            if(typeof this.elem.tag == "function"){
-                let res = this.elem.tag(this.elem.attributes);
-                this.htmlNode = res.render(); 
-                this.renderFunction = this.elem.tag;
-                return Memoize.memoize(arguments , this.htmlNode);
+            
+            // let memory = Memoize.remember(elem);
+            // if(memory){
+            //     this.htmlNode =  memory.cloneNode(true);
+            //     htmlNodes.push(this.htmlNode)
+            //     return this.htmlNode;
+            // }
+            
+            if(typeof elem.tag == "function"){
+                let atikElem = elem.tag(elem.attributes);
+                this.htmlNode = new RenderNode().render(atikElem); 
+                this.renderFunction = elem.tag;
+                
+                if(atikElem.watch){    
+                    Atik.hal.bind(atikElem.watch , (state) => {
+                        let aElem = elem.tag({...elem.attributes,...state});
+                        let node = new RenderNode().render(aElem);
+                        this.htmlNode.innerHTML = "";
+                        this.htmlNode.appendChild(node);
+                    });
+                }
+                htmlNodes.push(this.htmlNode)
+                return Memoize.memoize(elem , this.htmlNode);
             }else{
-                this.htmlNode = document.createElement(this.elem.tag,this.elem.attributes);
+                this.htmlNode = document.createElement(elem.tag,elem.attributes);
             }  
         }
 
-
-        
+        // console.log(++i);
 
         //check if a Atik Component
         if(this.renderFunction){
             this.htmlNode.innerHTML = "";
-            this.htmlNode.appendChild(this.renderFunction(this.elem.attributes).render());
+            this.htmlNode.appendChild(new RenderNode().render(this.renderFunction(elem.attributes)));
             return Memoize.memoize(arguments , this.htmlNode);
         }
 
         //assign attributes
-        if(this.elem.attributes){
-            
-            Object.assign(this.htmlNode,this.elem.attributes)  
+        if(elem.attributes){
+            Object.assign(this.htmlNode,elem.attributes)  
+        }
+        
+        //clear child
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
         }
 
-        //clear child
-        this.htmlNode.innerHTML = "";
-        for (const child of this.elem.children) {
+        for (const child of elem.children) {
               
             //checks if a render node or just a string
             if(typeof child == "string"){
                 this.htmlNode.appendChild(document.createTextNode(child));    
             }else{
-                this.htmlNode.appendChild(child.render());
+                this.htmlNode.appendChild( new RenderNode().render(child));
             }
         }
         
-
-        return Memoize.memoize(arguments , this.htmlNode);
+        return Memoize.memoize(elem , this.htmlNode);
 
     }
 
@@ -197,6 +228,7 @@ function nodeToAtikElement(node,props){
     if(node.nodeName == "#text"){
         return node.wholeText.replace(evalReg, (match) => {
             let exp = match.slice(2,-2);
+            
             return eval(exp);
         });
     }
@@ -205,15 +237,17 @@ function nodeToAtikElement(node,props){
     
     let children = [];
     
-    let aProps = [];
+    let aProps = new Map();
 
     for (const {name,value} of node.attributes) {
-
+        
         let res;
-
+        //console.log(name);
         //dangerous
-        if(name.startsWith('on')){
+        if(name.startsWith('on') ){
             res = eval(value);
+        }else if(value.startsWith('{{')){
+            res = eval(value.slice(2 , -2))
         }else{
             res = value.replace(evalReg, (match) => {
                 let exp = match.slice(2,-2);
@@ -222,10 +256,9 @@ function nodeToAtikElement(node,props){
         }
         
         
-        
 
         if(name.startsWith('a-')){
-            aProps.push({name,value})
+            aProps.set(name,value)
         }else{
             
             attrObj[name] = res;    
@@ -234,19 +267,20 @@ function nodeToAtikElement(node,props){
         
     } 
 
+    if(aProps.has('a-show')){
+        let val= aProps.get('a-show');
+        if(!eval(val))  return "";
+    }
 
-    for( const {name ,value} of aProps){
-        
+    for( const [name ,value] of aProps){
         switch(name){
-            case 'a-show': 
-                if(!eval(value))  return "";
-                break;
             case 'a-list': 
                 let [keyEv,listEv] = value.split("in");
+                //console.log(props);
                 let list = eval(listEv);
                 let key = keyEv.trim();
                 let children = [];
-                
+                //console.log(list);
                 for (const item of list) {
                     
                     let itemChildren = [];
@@ -265,6 +299,9 @@ function nodeToAtikElement(node,props){
                     children.push(Atik.createElement(tag,attrObj,...itemChildren))
                 }
                     
+                if(children.length == 0){
+                    return "";
+                }
 
                 return children;
                 break;
@@ -278,6 +315,7 @@ function nodeToAtikElement(node,props){
             
             if(atikParam){
                 if(atikParam.length){
+                    
                     children.push(...atikParam)
                 }else{
                     children.push(atikParam)
@@ -296,7 +334,9 @@ class Hal{
         this.state = state
         this.bindings = {}
         for(const key of Object.keys(state)){
-            this.bindings[key] = [];
+            if(!this.bindings[key]){
+                this.bindings[key] = [];
+            }
         }
     }
 
@@ -306,6 +346,13 @@ class Hal{
     }
 
     bind(keys, func){
+        
+        for(const key of keys){
+            if(!this.bindings[key]){
+                this.bindings[key] = [];
+            }
+        }
+       
         for (const key of keys) {
             this.bindings[key].push(func);    
         }

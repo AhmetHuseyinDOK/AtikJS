@@ -1,33 +1,84 @@
-const hal = new Hal({
-    name: "dnemasd"
+Atik.init({
+    tasks: []
 });
 
-Atik.component('asd',{
-    template: '<h1>{{props.name}}<h1>'
+Atik.component('time' , {
+    template: '<h6> {{props.tick}} </h6>',
+    watch: ['tick']
+});
+
+function updateAtik(id){
+    let item = Atik.hal.state.tasks[id]
+    item.done = !item.done;
+    Atik.hal.setState({tasks:Atik.hal.state.tasks});
+}
+
+Atik.component('todo_item',{
+    template: `
+
+        <span> {{props.todo.id}} => {{props.todo.name}} <button onclick="{{ () => updateAtik(props.todo.id)}}"> change </button> </span>
+         
+    `
+});
+
+Atik.component('done_list',{
+    template: `
+    <div>
+        <h1>Done List</h1>
+        <h3 a-show="{{props.tasks.length == 0}}">No item on the list</h3>
+        <ul a-show="{{props.tasks.length != 0}}">
+            <li  a-list="task in props.tasks.filter(({done}) => done)"><a-todo_item todo="{{props.task}}" /></li>
+        </ul>
+    </div>    
+    `,
+    watch: ["tasks"]
+});
+
+Atik.component('todo_list',{
+    template: `
+    <div>
+        <h1>To Do List</h1>
+        <h3 a-show="{{props.tasks.length == 0}}">No item on the list</h3>
+        <ul a-show="{{props.tasks.length != 0}}">
+            <li a-list="task in props.tasks.filter(({done}) => !done)"><a-todo_item todo="{{props.task}}" /></li>
+        </ul>
+    </div>    
+    `,
+    watch: ["tasks"]
 });
 
 Atik.component('main',{
     template: `
         <div>
             <input onchange={{props.onchange}}>
-            <a-asd name={{props.name}}></a-asd>
+            <a-todo_list tasks="{{ [] }}"></a-todo_list>
+            <a-done_list tasks="{{ [] }}"></a-done_list>
+            <a-time tick="{{ new Date() }}" ></a-time>
         </div>
    `
 });
 
-new Atik(
+setInterval( () => Atik.hal.setState({tick: new Date()}),500)
+
+Atik.render(
     main , 
     app,
     {
         props: {
-            name: hal.state.name ,
-            onchange: ({srcElement:{value}}) =>  hal.setState({name:value})
+            tasks: Atik.hal.state.tasks,
+            onchange: ({srcElement:{value}}) => {
+                console.log(value);
+                Atik.hal.setState({
+                    tasks: [...Atik.hal.state.tasks , {id: Atik.hal.state.tasks.length , done:false , name: value}]
+                })
+            }
         }
     }
 );
 
 
-hal.bind(['name'] , ({name}) => elem.render({name , onchange: ({srcElement:{value}}) =>  hal.setState({name:value})}))
-hal.bind(['name'], console.log)
+
+
+
 
 
