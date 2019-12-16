@@ -60,27 +60,52 @@ class Atik{
         Atik.hal = new Hal(props);
     }
 
+    static setRoutes(routes){
+        Atik.routes = routes;
+    }
+
+    static renderRoute(routeName){
+        let route = Atik.routes[routeName];
+        route.props = route.props || {};
+        route.props.query = new URLSearchParams(window.location.search);
+        if(route){
+            Atik.element  = Atik.createElement(route.component , route.props );
+        }else{
+            Atik.element = Atik.createElement(notfound,{});
+        }
+
+        Atik.root = new RenderNode().render(Atik.element);
+        
+    }
+
     /**
      * 
      * @param {Function} component 
      * @param {HTMLElement} elem 
      * @param {props } object 
      */
-    static render(component , elem , {props}){
+    static render(elem ){
 
         while (elem.firstChild) {
             elem.removeChild(elem.firstChild);
         }
 
-        Atik.element  = Atik.createElement(component , props );
-        Atik.root = new RenderNode().render(Atik.element);
+        Atik.renderRoute(window.location.hash)
+
         elem.appendChild(Atik.root);
         
+        window.onhashchange = function(event) {
+            console.log(event);
+            Atik.render(elem);
+        };
+
     }
 
 }
 
-
+Atik.component('notfound',{
+    template: '<h4>Not Found</h4>'
+})
 
 
 class Memoize{
@@ -373,3 +398,7 @@ class Hal{
     }
 
 }
+
+Atik.component('link',{
+    template: `<button onclick="{{() => window.location.hash =  props.to }}">{{props.name}}</button>`
+});

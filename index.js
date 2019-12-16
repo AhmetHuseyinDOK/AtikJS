@@ -13,6 +13,8 @@ function updateAtik(id){
     Atik.hal.setState({tasks:Atik.hal.state.tasks});
 }
 
+
+
 Atik.component('todo_item',{
     template: `
 
@@ -53,18 +55,21 @@ Atik.component('main',{
             <input onchange={{props.onchange}}>
             <a-todo_list tasks="{{ [] }}"></a-todo_list>
             <a-done_list tasks="{{ [] }}"></a-done_list>
-            <a-time tick="{{ new Date() }}" ></a-time>
+            <a-link to="#time" name="show me time" />
         </div>
    `
 });
 
-setInterval( () => Atik.hal.setState({tick: new Date()}),500)
+Atik.component('querycomp', {
+    template: "<h3>{{props.query.get('name')}}</h3>"
+})
 
-Atik.render(
-    main , 
-    app,
-    {
-        props: {
+//setInterval( () => Atik.hal.setState({tick: new Date()}),500)
+
+Atik.setRoutes({
+    '': {
+        component: main,
+        props:  {
             tasks: Atik.hal.state.tasks,
             onchange: ({srcElement:{value}}) => {
                 console.log(value);
@@ -73,8 +78,19 @@ Atik.render(
                 })
             }
         }
+    },
+    '#time':{
+        component: time,
+        props: {
+            tick: new Date()
+        }    
+    },
+    '#q':{
+        component: querycomp
     }
-);
+})
+
+Atik.render( app );
 
 
 

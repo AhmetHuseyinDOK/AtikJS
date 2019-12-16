@@ -4,81 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
     <script src="./hal.js"></script>
+    <title>Document</title>
 </head>
 <body>
-    <div style="text-align: center;" id='app'>
-    </div>
+    <div id=app></div>
 </body>
-<script>
-
-        function studentList(attributes){
-            return Atik.createElement(
-                'ul',
-                null,
-                ...attributes.list.map( s => student({name:s.name,id:s.id}))
-            )
-        }
-
-        function student(attributes){
-            return Atik.createElement(
-                'li',
-                null,
-                attributes.id+" "+attributes.name
-            )
-        }
-
-    let list = [
-        {
-            name: "ahmet dok",
-            id: 112
-        },
-        {
-            name: "kemal ak",
-            id: 113
-        },
-        {
-            name: "ahmet beyaz",
-            id: 114
-        },
-    ]
-    let nameEl = Atik.createElement('h6',null,"Ahmet Dok");
-    let timeEl = Atik.createElement('h1',null,"Deneme");
-    let studentEl = Atik.createElement(student,{name:"ahmet",id:"213"})
-    let studentListName = Atik.createElement(studentList,{list});
-
-    let elem = Atik.createElement(
-        "div",
-        null,
-        timeEl,
-        nameEl,
-        studentListName
-    );
-    let asd = Atik.createElement(
-        "div",
-        {
-            style:"background:blue"
-        },
-        elem
-    )
-    Atik.render(elem,app);
-    Atik.render(asd,app);
-
-    const hal = new Hal({
-        name: "ali",
-        deneme: "iki",
-        surname: "asdsa",
-        time: new Date()
-    });
-
-    hal.bind(["name","deneme"],({name,deneme}) => console.log(name + " " + deneme));
-    hal.bind(["name"],({name}) => nameEl.render(null,name));
-    hal.bind(["time"],({time}) => timeEl.render(null,time.toString()))
-
-    setInterval(()=>{hal.setState({time: new Date()})},500)
-
-    hal.setState({name:"name"})
-
-</script>
+<script src="./index.js"></script>
 </html>
