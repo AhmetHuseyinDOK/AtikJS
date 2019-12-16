@@ -51,8 +51,8 @@ Atik.component('main',{
     template: `
         <div>
             <input onchange={{props.onchange}}>
-            <a-todo_list tasks="{{ [] }}"></a-todo_list>
-            <a-done_list tasks="{{ [] }}"></a-done_list>
+            <a-todo_list tasks="{{ Atik.hal.state.tasks }}"></a-todo_list>
+            <a-done_list tasks="{{ Atik.hal.state.tasks }}"></a-done_list>
             <a-link to="#time" name="show me time" />
         </div>
    `
