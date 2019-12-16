@@ -13,8 +13,6 @@ function updateAtik(id){
     Atik.hal.setState({tasks:Atik.hal.state.tasks});
 }
 
-
-
 Atik.component('todo_item',{
     template: `
 
@@ -64,7 +62,7 @@ Atik.component('querycomp', {
     template: "<h3>{{props.query.get('name')}}</h3>"
 })
 
-//setInterval( () => Atik.hal.setState({tick: new Date()}),500)
+setInterval( () => Atik.hal.setState({tick: new Date()}),500)
 
 Atik.setRoutes({
     '': {
