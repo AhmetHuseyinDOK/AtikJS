@@ -7,6 +7,7 @@
     <title>Wordify</title>
     <script src="../hal.js"></script>
     <link rel="stylesheet" href="./style.css">
+    <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&display=swap" rel="stylesheet">
 
 </head>
@@ -14,4 +15,5 @@
     <div id=app></div>
 </body>
 <script src="./index.js"></script>
+<script>navigator.serviceWorker.register('sw.js')</script>
 </html>
