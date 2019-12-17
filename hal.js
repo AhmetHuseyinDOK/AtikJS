@@ -6,23 +6,20 @@ class Atik{
      * 
      * @param {*} name 
      * @param {object} parameters 
+     * @param {Function} mapper
      */
-    static component(name,{template ,watch }){
+    static component(name,{template ,watch , mapper }){
         let fun  = (props) => {
+            if(mapper){
+                props = {...props ,  ...mapper(props)};
+            }
             let elem =  Atik.createElementFromTemplate(template,props);
             elem.watch = watch;
             
             return elem;
         }
 
-        window[name] = new Proxy(fun,{
-            apply: (target , thisArg , argArr) => {
-                
-                let res =  target(...argArr);
-                arr.push(res);
-                return res;
-            }
-        });
+        window[name] = fun;
         
     }
 
@@ -102,7 +99,7 @@ class Atik{
         elem.appendChild(Atik.root);
         
         window.onhashchange = function(event) {
-           
+            
             Atik.render(elem);
         };
 
@@ -157,6 +154,7 @@ class Element{
 
 let i = 0;
 let htmlNodes = [];
+let nodes = [];
 class RenderNode{
 
     /**
@@ -165,55 +163,49 @@ class RenderNode{
      */
     constructor(){
         this.$_htmlNode;
+        nodes.push(this);
     }   
 
 
-    
-
-    //refactor it or die!!!
+    /**
+     * 
+     * @param {Element} elem 
+     */
     render(elem ){
         
 
         //if not mounted which means the first render
         if(!this.htmlNode){
             
-            // let memory = Memoize.remember(elem);
-            // if(memory){
-            //     this.htmlNode =  memory.cloneNode(true);
-            //     htmlNodes.push(this.htmlNode)
-            //     return this.htmlNode;
-            // }
-            
+            //every component indeed is a function so we check it
             if(typeof elem.tag == "function"){
+                //get the element from Component
                 let atikElem = elem.tag(elem.attributes);
+                //open up a new render node to hold htmlNode
                 this.htmlNode = new RenderNode().render(atikElem); 
-                this.renderFunction = elem.tag;
-                
-                if(atikElem.watch){    
+                //for further renders render directly from here
+                if(atikElem.watch){
+                    //below function will trigger whenever specified state updated    
                     Atik.hal.bind(atikElem.watch , (state) => {
+                        //add state to attributes
+                        // should i give the state seperately  ?
                         let aElem = elem.tag({...elem.attributes,...state});
+                        //create a new render node 
                         let node = new RenderNode().render(aElem);
                         this.htmlNode.innerHTML = "";
+                        //update the old htmlNode
                         this.htmlNode.appendChild(node);
                     });
                 }
 
-                htmlNodes.push(this.htmlNode)
-                return Memoize.memoize(elem , this.htmlNode);
+                return  this.htmlNode;
             }else{
-                this.htmlNode = document.createElement(elem.tag,elem.attributes);
+                //if it is a regular html tag just render it
+                this.htmlNode = document.createElement(elem.tag);
             }  
+            
         }
-
-        // console.log(++i);
-
-        //check if a Atik Component
-        if(this.renderFunction){
-            this.htmlNode.innerHTML = "";
-            this.htmlNode.appendChild(new RenderNode().render(this.renderFunction(elem.attributes)));
-            return Memoize.memoize(arguments , this.htmlNode);
-        }
-
+        
         //assign attributes
         if(elem.attributes){
             Object.assign(this.htmlNode,elem.attributes)  
@@ -232,13 +224,12 @@ class RenderNode{
             }else{
                 this.htmlNode.appendChild( new RenderNode().render(child));
             }
+
         }
         
-        return Memoize.memoize(elem , this.htmlNode);
+        return this.htmlNode;
 
     }
-
-    
 
 }
 
@@ -263,37 +254,42 @@ function nodeToAtikElement(node,props){
     if(node.nodeName == "#text"){
         return node.wholeText.replace(evalReg, (match) => {
             let exp = match.slice(2,-2);
-            
+        
             return eval(exp);
         });
     }
-
+    //check if it is a AtikComponent or regular HTML Tag
     let tag = nodeName.startsWith('a-') ? eval(nodeName.slice(2)) : nodeName ;
     
     let children = [];
     
+    //this is going to hold Atik Specific Attributes
     let aProps = new Map();
 
     for (const {name,value} of node.attributes) {
         
         let res;
-        //console.log(name);
-        //dangerous
+        
+        //evaluates the value
+        //if it starts with on that means it is a function
         if(name.startsWith('on') ){
+            //so evaluate the function
             res = eval(value);
         }else if(value.startsWith('{{')){
+            // if it is form {{ }} , we need to evaluate it 
             res = eval(value.slice(2 , -2))
         }else{
+            //if it is just a string just replace the values after evaluation
             res = value.replace(evalReg, (match) => {
                 let exp = match.slice(2,-2);
                 return eval(exp);
             });
         }
         
-        
-
+        //if it is an Atik component
         if(name.startsWith('a-')){
-            aProps.set(name,value)
+            aProps.set(name,res)
+        //if it just an html Element   
         }else{
             
             attrObj[name] = res;    
@@ -302,9 +298,10 @@ function nodeToAtikElement(node,props){
         
     } 
 
+    // check for a-show do nothing further if the value false
     if(aProps.has('a-show')){
         let val= aProps.get('a-show');
-        if(!eval(val))  return "";
+        if(!val)  return "";
     }
 
     for( const [name ,value] of aProps){

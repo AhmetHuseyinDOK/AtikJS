@@ -5,7 +5,7 @@ Atik.init({
 })
 
 Atik.component('word_list_item',{
-    template: `<div onclick="{{ () => window.location =  '#wordInfo' + '?id=' + props.word.id  }}" class="word_list_item">{{props.word.word}}<br>{{props.word.meaning}}</div>`
+    template: `<div onclick="() => window.location =  '#wordInfo' + '?id=' + props.word.id" class="word_list_item">{{props.word.word}}<br>{{props.word.meaning}}</div>`
 });
 
 Atik.component('word_list',{
@@ -31,7 +31,7 @@ Atik.component('new_word_screen' ,{
                 <input id=exampleMeaningInp placeholder="Meaning of example"/>
             </form>
             </div>
-            <div class="save" onclick="{{ () => { addWord({word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); } }}" > save </div>
+            <div class="save" onclick="() => { addWord({word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); }" > save </div>
         </div>
     `
 })
@@ -39,48 +39,51 @@ Atik.component('new_word_screen' ,{
 Atik.component('word_edit_screen' ,{
     template: `
         <div class="new_word_screen">
-            <div class="header"> {{ Atik.hal.state.words.get(Number(props.query.get('id'))).word }} </div>
+            <div class="header"> {{ props.word.word }} </div>
             <div class="body">
             <form >
-                <input id=wordInp placeholder="Word" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).word}}" />
-                <input id=meaningInp placeholder="Meaning" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning}}"/>
-                <input id=exampleInp placeholder="Example" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).example}}"/>
-                <input id=exampleMeaningInp placeholder="Meaning of example" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).exampleMeaning}}"/>
+                <input id=wordInp placeholder="Word" value="{{props.word.word || ''}}" />
+                <input id=meaningInp placeholder="Meaning" value="{{props.word.meaning || ''}}"/>
+                <input id=exampleInp placeholder="Example" value="{{props.word.example || ''}}"/>
+                <input id=exampleMeaningInp placeholder="Meaning of example" value="{{props.word.exampleMeaning || ''}}"/>
             </form>
             </div>
-            <div class="save" onclick="{{ () => { updateWord({id: Number(props.query.get('id')) , word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); } }}" > save </div>
+            <div class="save" onclick="() => { updateWord({id: props.word.id , word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); }" > save </div>
         </div>
-    `
+    `,
+    mapper: ({query}) => ({word: Atik.hal.state.words.get(Number(query.get('id')))})
 })
 
 Atik.component('word_info_screen',{
     template: `
         <div class="word_info_screen">
-            <div class="header"> {{Atik.hal.state.words.get(Number(props.query.get('id'))).word}} </div>
+            <div class="header"> {{props.word.word}} </div>
             <div class="body">
                 <div class="label">Word</div>
-                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).word || "not specified" }}</div>
+                <div>{{props.word.word || "not specified" }}</div>
                 <div class="label">Meaning</div>
-                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning || "not specified" }}</div>
+                <div>{{props.word.meaning || "not specified" }}</div>
                 <div class="label">Example</div>
-                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).example || "not specified"}}</div>
+                <div>{{props.word.example || "not specified"}}</div>
                 <div class="label">Meaning of Example</div>
-                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).exampleMeaning || "not specified"}}</div>
+                <div>{{props.word.exampleMeaning || "not specified"}}</div>
                 <div class="fab upper" onclick="{{ () => { window.location =  '#wordEdit' + '?id=' + props.query.get('id') } }}"> u </fab>
-                <div class="fab" onclick="{{ () => { deleteWord(Number(props.query.get('id'))); history.back(); } }}">-</fab>
+                <div class="fab" onclick="() => { deleteWord(props.word.id); history.back(); }">-</fab>
             </div>
         </div>
-    `
+    `,
+    mapper: ({query}) => ({word: Atik.hal.state.words.get(Number(query.get('id')))})
 })
 
 Atik.component('word_list_header',{
     template: `
         <div class="word_list_header">
-            {{ props.words.size }} </br>
+            {{ props.size }} </br>
             <span>word you have learnt</span>
         </div>
     `,
-    watch:["words"]
+    watch:["words"],
+    mapper: ({words}) => ({size: words.size})
 })
 
 Atik.component('fab',{
