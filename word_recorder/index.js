@@ -29,7 +29,7 @@ Atik.component('new_word_screen' ,{
                 <input id=exampleInp placeholder="Example" />
                 <input id=exampleMeaningInp placeholder="Meaning of example"/>
             </form>
-            <div class="save" onclick="{{ () => addWord({word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}) }}" > save </div>
+            <div class="save" onclick="{{ () => { addWord({word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); } }}" > save </div>
         </div>
     `
 })
@@ -40,9 +40,9 @@ Atik.component('word_info_screen',{
             <div class="header"> {{Atik.hal.state.words.get(Number(props.query.get('id'))).word}} </div>
             <div class="body">
                 <div class="label">Word</div>
-                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).word}}</div>
+                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).word || "not specified" }}</div>
                 <div class="label">Meaning</div>
-                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning}}</div>
+                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning || "not specified" }}</div>
                 <div class="label">Example</div>
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).example || "not specified"}}</div>
                 <div class="label">Meaning of Example</div>
