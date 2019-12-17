@@ -45,6 +45,10 @@ body{
     border-radius:  var(--size);
 }
 
+.fab.upper{
+    bottom: calc( var(--size) + 40px) 
+}
+
 a.fab{
     text-decoration: none;
 }

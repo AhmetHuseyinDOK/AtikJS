@@ -36,6 +36,23 @@ Atik.component('new_word_screen' ,{
     `
 })
 
+Atik.component('word_edit_screen' ,{
+    template: `
+        <div class="new_word_screen">
+            <div class="header"> {{ Atik.hal.state.words.get(Number(props.query.get('id'))).word }} </div>
+            <div class="body">
+            <form >
+                <input id=wordInp placeholder="Word" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).word}}" />
+                <input id=meaningInp placeholder="Meaning" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning}}"/>
+                <input id=exampleInp placeholder="Example" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).example}}"/>
+                <input id=exampleMeaningInp placeholder="Meaning of example" value="{{Atik.hal.state.words.get(Number(props.query.get('id'))).exampleMeaning}}"/>
+            </form>
+            </div>
+            <div class="save" onclick="{{ () => { updateWord({id: Number(props.query.get('id')) , word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); } }}" > save </div>
+        </div>
+    `
+})
+
 Atik.component('word_info_screen',{
     template: `
         <div class="word_info_screen">
@@ -49,6 +66,7 @@ Atik.component('word_info_screen',{
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).example || "not specified"}}</div>
                 <div class="label">Meaning of Example</div>
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).exampleMeaning || "not specified"}}</div>
+                <div class="fab upper" onclick="{{ () => { window.location =  '#wordEdit' + '?id=' + props.query.get('id') } }}"> u </fab>
                 <div class="fab" onclick="{{ () => { deleteWord(Number(props.query.get('id'))); history.back(); } }}">-</fab>
             </div>
         </div>
@@ -96,6 +114,9 @@ Atik.setRoutes({
     },
     '#wordInfo':{
         component: word_info_screen
+    },
+    '#wordEdit':{
+        component: word_edit_screen
     }
 })
 
@@ -116,6 +137,13 @@ function addWord({word , meaning,example,exampleMeaning}){
     let savedWord = new Word({word,meaning,exampleMeaning,example})
     let wordMap = new Map([...Atik.hal.state.words , [savedWord.id , savedWord]])
     Atik.hal.setState({words: wordMap})
+}
+
+function updateWord({id, word , meaning,example,exampleMeaning}){
+    let savedWord = new Word({word,meaning,exampleMeaning,example})
+    savedWord.id = id;
+    Atik.hal.state.words.set(id , savedWord)
+    Atik.hal.setState({words: Atik.hal.state.words})
 }
 
 function deleteWord(id){
