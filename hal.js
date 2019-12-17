@@ -26,10 +26,6 @@ class Atik{
         
     }
 
-    static $_render(){
-        
-    }
-
     /**
      * 
      * @param {*} tag 
@@ -64,11 +60,22 @@ class Atik{
         Atik.routes = routes;
     }
 
-    static renderRoute(routeName){
+    static renderRoute(routeString){ 
+        
+        let routeName = routeString
+        let queryString = ""
+        let indexOfQuestionMark = routeString.indexOf('?');
+        if(indexOfQuestionMark != -1){
+            routeName = routeString.slice(0, -1 * (routeString.length - indexOfQuestionMark))
+            queryString = routeString.slice(indexOfQuestionMark);
+        }
+        
+        
         let route = Atik.routes[routeName];
-        route.props = route.props || {};
-        route.props.query = new URLSearchParams(window.location.search);
+        
         if(route){
+            route.props = route.props || {};
+            route.props.query = new URLSearchParams(queryString);
             Atik.element  = Atik.createElement(route.component , route.props );
         }else{
             Atik.element = Atik.createElement(notfound,{});
@@ -91,7 +98,7 @@ class Atik{
         }
 
         Atik.renderRoute(window.location.hash)
-
+        
         elem.appendChild(Atik.root);
         
         window.onhashchange = function(event) {
@@ -190,6 +197,7 @@ class RenderNode{
                         this.htmlNode.appendChild(node);
                     });
                 }
+
                 htmlNodes.push(this.htmlNode)
                 return Memoize.memoize(elem , this.htmlNode);
             }else{
@@ -351,7 +359,7 @@ function nodeToAtikElement(node,props){
     }
 
 
-    console.log(attrObj)
+    //console.log(attrObj)
     return Atik.createElement(tag,attrObj,...children);
 }
 
@@ -383,6 +391,7 @@ class Hal{
         for (const key of keys) {
             this.bindings[key].push(func);    
         }
+
     }
 
     notify(keys,state){

@@ -5,7 +5,7 @@ Atik.init({
 })
 
 Atik.component('word_list_item',{
-    template: `<div onclick="{{ () => window.location = '?id=' + props.word.id + '#wordInfo' }}" class="word_list_item">{{props.word.word}}<br>{{props.word.meaning}}</div>`
+    template: `<div onclick="{{ () => window.location =  '#wordInfo' + '?id=' + props.word.id  }}" class="word_list_item">{{props.word.word}}<br>{{props.word.meaning}}</div>`
 });
 
 Atik.component('word_list',{
