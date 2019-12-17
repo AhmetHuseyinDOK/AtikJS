@@ -66,12 +66,18 @@ input{
     width: 80%;
 }
 
-.new_word_screen{
+.word_info_screen .label{
+    margin-top: 20px;
+    font-size: smaller;
+    color: darkgray;
+}
+
+.new_word_screen,.word_info_screen{
     height: 100vh;
 
 }
 
-.new_word_screen .header{
+.new_word_screen .header ,.word_info_screen .header{
     color: white;
     text-align: center;
     padding: 25px;
@@ -81,6 +87,10 @@ input{
 .new_word_screen .body{
     padding-top: 20px;
     padding-bottom: 400px;
+}
+
+.word_info_screen .body{
+    padding: 20px
 }
 
 .new_word_screen .save{

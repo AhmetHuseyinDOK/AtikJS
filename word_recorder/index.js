@@ -5,7 +5,7 @@ Atik.init({
 })
 
 Atik.component('word_list_item',{
-    template: '<div class="word_list_item">{{props.word.word}}<br>{{props.word.meaning}}</div>'
+    template: `<div onclick="{{ () => window.location = '?id=' + props.word.id + '#wordInfo' }}" class="word_list_item">{{props.word.word}}<br>{{props.word.meaning}}</div>`
 });
 
 Atik.component('word_list',{
@@ -30,6 +30,24 @@ Atik.component('new_word_screen' ,{
                 <input id=exampleMeaningInp placeholder="Meaning of example"/>
             </form>
             <div class="save" onclick="{{ () => addWord({word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}) }}" > save </div>
+        </div>
+    `
+})
+
+Atik.component('word_info_screen',{
+    template: `
+        <div class="word_info_screen">
+            <div class="header"> {{Atik.hal.state.words.get(Number(props.query.get('id'))).word}} </div>
+            <div class="body">
+                <div class="label">Word</div>
+                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).word}}</div>
+                <div class="label">Word</div>
+                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning}}</div>
+                <div class="label">Word</div>
+                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).example || "not specified"}}</div>
+                <div class="label">Word</div>
+                <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).exampleMeaning || "not specified"}}</div>
+            </div>
         </div>
     `
 })
@@ -72,6 +90,9 @@ Atik.setRoutes({
     },
     '#newWord':{
         component: new_word_screen
+    },
+    '#wordInfo':{
+        component: word_info_screen
     }
 })
 
