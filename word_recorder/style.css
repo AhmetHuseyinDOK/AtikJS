@@ -80,13 +80,14 @@ input{
 
 .new_word_screen .body{
     padding-top: 20px;
+    padding-bottom: 400px;
 }
 
 .new_word_screen .save{
     text-align: center;
     color: white;
     padding: 40px;
-    position: absolute;
+    position: fixed;
     width: calc( 100% - 80px);
     bottom: 0;
     background-color: indigo;
