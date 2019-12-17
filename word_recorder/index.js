@@ -1,7 +1,7 @@
 
 
 Atik.init({
-    words: new Map(JSON.parse(window.localStorage.getItem('words')))
+    words: new Map( JSON.parse(window.localStorage.getItem('words'))  || [])
 })
 
 Atik.component('word_list_item',{
@@ -41,12 +41,13 @@ Atik.component('word_info_screen',{
             <div class="body">
                 <div class="label">Word</div>
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).word}}</div>
-                <div class="label">Word</div>
+                <div class="label">Meaning</div>
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).meaning}}</div>
-                <div class="label">Word</div>
+                <div class="label">Example</div>
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).example || "not specified"}}</div>
-                <div class="label">Word</div>
+                <div class="label">Meaning of Example</div>
                 <div>{{Atik.hal.state.words.get(Number(props.query.get('id'))).exampleMeaning || "not specified"}}</div>
+                <div class="fab" onclick="{{ () => { deleteWord(Number(props.query.get('id'))); history.back(); } }}">-</fab>
             </div>
         </div>
     `
@@ -108,14 +109,16 @@ class Word{
     }
 }
 
-/**
- * 
- * @param {Word} word 
- */
+
 function addWord({word , meaning,example,exampleMeaning}){
     let savedWord = new Word({word,meaning,exampleMeaning,example})
     let wordMap = new Map([...Atik.hal.state.words , [savedWord.id , savedWord]])
     Atik.hal.setState({words: wordMap})
+}
+
+function deleteWord(id){
+    Atik.hal.state.words.delete(id);
+    Atik.hal.setState({words: Atik.hal.state.words});
 }
 
 Atik.hal.bind(["words"], ({words}) => {
