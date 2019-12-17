@@ -23,12 +23,14 @@ Atik.component('new_word_screen' ,{
     template: `
         <div class="new_word_screen">
             <div class="header"> New Word </div>
-            <form class="body">
+            <div class="body">
+            <form >
                 <input id=wordInp placeholder="Word" />
                 <input id=meaningInp placeholder="Meaning" />
                 <input id=exampleInp placeholder="Example" />
                 <input id=exampleMeaningInp placeholder="Meaning of example"/>
             </form>
+            </div>
             <div class="save" onclick="{{ () => { addWord({word: wordInp.value , meaning: meaningInp.value , example:  exampleInp.value , exampleMeaning: exampleMeaningInp.value}); history.back(); } }}" > save </div>
         </div>
     `
