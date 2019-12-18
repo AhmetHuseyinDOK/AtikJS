@@ -67,8 +67,8 @@ Atik.component('word_info_screen',{
                 <div>{{props.word.example || "not specified"}}</div>
                 <div class="label">Meaning of Example</div>
                 <div>{{props.word.exampleMeaning || "not specified"}}</div>
-                <div class="fab upper" onclick="{{ () => { window.location =  '#wordEdit' + '?id=' + props.query.get('id') } }}"> u </fab>
-                <div class="fab" onclick="() => { deleteWord(props.word.id); history.back(); }">-</fab>
+                <div class="fab upper" onclick="{{ () => { window.location =  '#wordEdit' + '?id=' + props.query.get('id') } }}"> u </div>
+                <div class="fab" onclick="() => { deleteWord(props.word.id); history.back(); }">-</div>
             </div>
         </div>
     `,
