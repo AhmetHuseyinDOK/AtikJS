@@ -110,5 +110,48 @@ Atik.component("tavsiyeler_list", {
 });
 ```
 
+## Iterating over lists
 
+Current iteration can be accessed through via `props.iterationName`
+
+```
+Atik.component("tavsiyeler_list", {
+  template: `
+    <ul>
+          <div a-list="tavsiye in props.tavsiyeler" >
+            <a-list_item word="{{props.tavsiyeler}}"></a-list-item>
+          </div>
+          
+       </ul>
+    `,
+  watch: ["tavsiyeler"],
+});
+```
+
+## Setting Routes
+
+Atik provides a built in hash routing. Components can be diretly accessed via their names since they are already registered to window object.
+
+```
+Atik.setRoutes({
+    '': {
+        component: main_screen
+    },
+    '#newWord':{
+        component: new_word_screen
+    },
+    '#wordInfo':{
+        component: word_info_screen
+    },
+    '#wordEdit':{
+        component: word_edit_screen
+    }
+})
+```
+
+## Start rendering
+
+```
+Atik.render(document.getElementById("app"));
+```
 
