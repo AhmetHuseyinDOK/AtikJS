@@ -1,5 +1,11 @@
 # AtikJS
-A hobby project to dynamically render html with a data driven approach featuring build in hash routing
+A hobby project to dynamically render html with a data driven approach featuring build in hash routing.
+
+## Example Project
+
+View Source Code From [Here](https://github.com/AhmetHuseyinDOK/AtikJS/blob/master/word_recorder/index.js)
+
+View Project From [Here](https://ahmethuseyindok.github.io/AtikJS/word_recorder/)
 
 ## How to include to a project
 
