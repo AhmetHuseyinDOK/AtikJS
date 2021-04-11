@@ -154,6 +154,11 @@ Atik.setRoutes({
     }
 })
 ```
+## Updating Global State
+
+```
+Atik.hal.setState({ words: [...Atik.hal.state.words, "Ve surekli pratik yap"] });
+```
 
 ## Start rendering
 
